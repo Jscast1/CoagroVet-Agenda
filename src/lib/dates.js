@@ -63,3 +63,49 @@ export function formatMonthYear(year, month) {
   })
   return text.charAt(0).toUpperCase() + text.slice(1)
 }
+
+// 150 -> "2 h 30 min"
+export function formatDuration(min) {
+  const h = Math.floor(min / 60)
+  const m = min % 60
+  if (!h) return `${m} min`
+  return m ? `${h} h ${m} min` : `${h} h`
+}
+
+// (3, 'years') -> "3 años" | (1, 'months') -> "1 mes"
+export function formatAge(value, unit) {
+  if (!value) return ''
+  const n = Number(value)
+  const word = unit === 'months' ? (n === 1 ? 'mes' : 'meses') : n === 1 ? 'año' : 'años'
+  return `${n} ${word}`
+}
+
+export function formatShortDate(iso) {
+  return fromISODate(iso).toLocaleDateString('es-HN', { day: 'numeric', month: 'short', year: 'numeric' })
+}
+
+// La edad se guarda en meses el día del registro; aquí se calcula la edad actual.
+export function currentAgeMonths(pet) {
+  if (pet.ageInMonths == null) return null
+  const rec = fromISODate(pet.ageRecordedAt || toISODate(new Date()))
+  const now = new Date()
+  const diff = (now.getFullYear() - rec.getFullYear()) * 12 + (now.getMonth() - rec.getMonth())
+  return pet.ageInMonths + Math.max(0, diff)
+}
+
+export function formatAgeMonths(total) {
+  if (total == null) return ''
+  if (total < 12) return `${total} ${total === 1 ? 'mes' : 'meses'}`
+  const y = Math.floor(total / 12)
+  const m = total % 12
+  const years = `${y} ${y === 1 ? 'año' : 'años'}`
+  return m ? `${years} ${m} ${m === 1 ? 'mes' : 'meses'}` : years
+}
+
+// "2 nov, 3:45 PM" a partir de una fecha ISO completa
+export function formatStamp(iso) {
+  const d = new Date(iso)
+  const date = d.toLocaleDateString('es-HN', { day: 'numeric', month: 'short' })
+  const time = formatTime(`${d.getHours()}:${String(d.getMinutes()).padStart(2, '0')}`)
+  return `${date}, ${time}`
+}

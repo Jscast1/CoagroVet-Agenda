@@ -7,9 +7,7 @@ import { fromISODate, formatMonthYear, formatTime, monthMatrix, toISODate } from
 const WEEKDAYS = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
 
 const DOT = {
-  pendiente: 'bg-amber-500',
-  confirmada: 'bg-navy-600',
-  en_curso: 'bg-brand-orange',
+  agendaa: 'bg-navy-600' ,
   completada: 'bg-emerald-500',
   cancelada: 'bg-red-500',
 }
@@ -139,7 +137,7 @@ export default function MonthCalendar({ selectedDate, onSelect, refreshKey = 0 }
                         isSelected ? 'bg-white/15' : 'bg-white'
                       }`}
                     >
-                      <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${DOT[a.status] ?? DOT.pendiente}`} />
+                      <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${DOT[a.status] ?? DOT.agedada}`} />
                       <span className="truncate">
                         {formatTime(a.time)} {a.patient}
                       </span>
@@ -159,9 +157,8 @@ export default function MonthCalendar({ selectedDate, onSelect, refreshKey = 0 }
 
       <ul className="mt-4 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted">
         {[
-          ['pendiente', 'Pendiente'],
-          ['confirmada', 'Confirmada'],
-          ['en_curso', 'En curso'],
+          ['agendada', 'Agendada'],
+          
           ['completada', 'Completada'],
           ['cancelada', 'Cancelada'],
         ].map(([key, label]) => (

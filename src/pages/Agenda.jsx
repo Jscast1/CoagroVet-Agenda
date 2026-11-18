@@ -4,12 +4,12 @@ import { CalendarPlus, ChevronLeft, ChevronRight } from 'lucide-react'
 import PageHeader from '../components/PageHeader.jsx'
 import Button from '../components/Button.jsx'
 import AppointmentCard from '../components/agenda/AppointmentCard.jsx'
+import MonthCalendar from '../components/agenda/MonthCalendar.jsx'
 import { STATUS } from '../components/agenda/StatusBadge.jsx'
 import { getAppointmentsByDate, updateAppointmentStatus } from '../lib/api.js'
 import { addDays, formatLongDate, isToday, toISODate } from '../lib/dates.js'
-import MonthCalendar from '../components/agenda/MonthCalendar.jsx'
 
-const FILTERS = ['todas', 'pendiente', 'confirmada', 'en_curso', 'completada', 'cancelada']
+const FILTERS = ['todas', 'agendada', 'completada', 'cancelada']
 
 export default function Agenda() {
   const [date, setDate] = useState(toISODate(new Date()))
@@ -20,11 +20,6 @@ export default function Agenda() {
   const [busyId, setBusyId] = useState(null)
   const [reload, setReload] = useState(0)
   const [changes, setChanges] = useState(0) // avisa al calendario que hubo cambios
-
-  function handleSelectFromCalendar(iso) {
-    setDate(iso)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
 
   // Carga las citas cada vez que cambia el día
   useEffect(() => {
@@ -43,14 +38,22 @@ export default function Agenda() {
   async function handleChangeStatus(id, status) {
     setBusyId(id)
     try {
-      await updateAppointmentStatus(id, status)
-      setAppointments((list) => list.map((a) => (a.id === id ? { ...a, status } : a)))
+      const updated = await updateAppointmentStatus(id, status)
+      setAppointments((list) =>
+        list.map((a) => (a.id === id ? { ...a, status, history: updated.history } : a))
+      )
+      
       setChanges((n) => n + 1)
     } catch (e) {
       setError(e.message)
     } finally {
       setBusyId(null)
     }
+  }
+
+  function handleSelectFromCalendar(iso) {
+    setDate(iso)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const sorted = useMemo(
@@ -166,11 +169,12 @@ export default function Agenda() {
         </div>
       )}
 
+      {/* Calendario mensual al final de la agenda */}
       <MonthCalendar
-          selectedDate={date}
-          onSelect={handleSelectFromCalendar}
-          refreshKey={changes}
-        />
+        selectedDate={date}
+        onSelect={handleSelectFromCalendar}
+        refreshKey={changes}
+      />
     </>
   )
 }
